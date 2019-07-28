@@ -3,13 +3,19 @@ package com.sc0ville.app;
 import com.sc0ville.app.model.DataPoint;
 import com.sc0ville.app.model.FlightPath;
 import com.sc0ville.app.model.LidarPoint;
+import com.sc0ville.app.model.MapPoint;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
 
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.sc0ville.app.Constant.NEW_LINE_SEPARATOR;
 
 /**
  * FileOperator
@@ -79,6 +85,41 @@ public class FIleOperator
         }
     }
 
+    public void write(String path, List<MapPoint> list)
+    {
+        FileWriter fileWriter = null;
+        CSVPrinter csvFilePrinter = null;
+        CSVFormat csvFileFormat = CSVFormat.DEFAULT.withRecordSeparator(NEW_LINE_SEPARATOR);
+        try
+        {
+            fileWriter = new FileWriter(path);
+            csvFilePrinter = new CSVPrinter(fileWriter, csvFileFormat);
+            for(MapPoint mapPoint:list)
+            {
+                List mapList = new ArrayList();
+                mapList.add(String.valueOf(mapPoint.getxStart()));
+                mapList.add(String.valueOf(mapPoint.getyStart()));
+                mapList.add(String.valueOf(mapPoint.getxEnd()));
+                mapList.add(String.valueOf(mapPoint.getyEnd()));
+                csvFilePrinter.printRecord(mapList);
+            }
+        }catch (Exception ex)
+        {
+            System.out.println("Error writing the file");
+        }
+        finally {
+            try
+            {
+                fileWriter.flush();
+                fileWriter.close();
+                csvFilePrinter.close();
+            }catch (IOException ex)
+            {
+                System.out.println("Error closing the writers");
+            }
+        }
+    }
+
     public String getFlightPath()
     {
         return flightPath;
@@ -122,7 +163,8 @@ public class FIleOperator
         {
             return new ArrayList<>();
         }
-        else {
+        else
+            {
             return lidarPointList;
         }
 
